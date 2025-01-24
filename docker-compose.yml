@@ -1,0 +1,61 @@
+version: '3.9'
+services:
+#  keycloak:
+#    image: quay.io/keycloak/keycloak:latest
+#    container_name: keycloak
+#    environment:
+#      KEYCLOAK_ADMIN: admin
+#      KEYCLOAK_ADMIN_PASSWORD: admin
+#    command: start-dev
+#    ports:
+#      - "8081:8080"
+#    # If you wish to use an external DB for Keycloak, configure it here
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: db-postgres1
+    environment:
+      POSTGRES_USER: giluser
+      POSTGRES_PASSWORD: gilpass
+      POSTGRES_DB: categorydb
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U giluser -d categorydb" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      #context: ./backend
+      dockerfile: Dockerfile
+    container_name: category-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+#      - keycloak
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      # Connection details for PostgreSQL
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/categorydb
+      SPRING_DATASOURCE_USERNAME: giluser
+      SPRING_DATASOURCE_PASSWORD: gilpass
+      # Keycloak base URL (if integrating security)
+#      KEYCLOAK_URL: http://keycloak:8080
+      # Additional environment variables if needed
+    ports:
+      - "8080:8080"
+
+#  frontend:
+#    build:
+#      context: ./frontend
+#      dockerfile: Dockerfile
+#    container_name: category-frontend
+#    depends_on:
+#      - backend
+#    ports:
+#      - "4200:80"
+#    environment:
+#      # Example environment variable for Angular to call the backend
+#      API_URL: http://backend:8080/api
