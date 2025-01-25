@@ -34,12 +34,13 @@ public class CategoryServiceImpl implements CategoryService {
                     .orElseThrow(() -> new ResourceNotFoundException("Parent not found"));
 
         }
-        if (parent != null)
-            incrementAncestorsDescendantsCount(parent,1);
+
 
         Category category = new Category();
         category.setName(dto.getName());
         category.setParent(parent);
+        if (parent != null)
+            incrementAncestorsDescendantsCount(category,1);
         categoryRepository.save(category);
 
         return mapToDto(category);
