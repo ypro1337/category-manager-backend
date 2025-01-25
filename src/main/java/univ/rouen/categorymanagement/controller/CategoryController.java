@@ -1,12 +1,19 @@
 package univ.rouen.categorymanagement.controller;
 
 import univ.rouen.categorymanagement.dto.CategoryDto;
+import univ.rouen.categorymanagement.exception.ResourceNotFoundException;
+import univ.rouen.categorymanagement.repository.criteria.CategoryCriteria;
 import univ.rouen.categorymanagement.service.CategoryService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -47,10 +54,33 @@ public class CategoryController {
     public ResponseEntity<List<CategoryDto>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "name") String sort,
-            @RequestParam(required = false) String filter
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String dateAfter,
+            @RequestParam(required = false) String dateBefore,
+            @RequestParam(required = false) Boolean isRoot,
+            @RequestParam(required = false) Integer descendantsCount
     ) {
-        List<CategoryDto> categories = categoryService.getAllCategories(page, size, sort, filter);
+        // 1) Build the criteria object
+        CategoryCriteria criteria = new CategoryCriteria();
+        criteria.setSearch(search);
+        try {
+            // parse dateAfter/dateBefore to LocalDate
+            if (dateAfter != null && !dateAfter.isEmpty()) {
+                criteria.setDateAfter(LocalDateTime.parse(dateAfter));
+            }
+            if (dateBefore != null && !dateBefore.isEmpty()) {
+                    criteria.setDateAfter(LocalDateTime.parse(dateBefore));
+            }
+        }
+        catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format. Expected format: timestamp(yyyy-MM-dd'T'HH:mm:ss.SSSSSS)");
+        }
+
+        criteria.setIsRoot(isRoot);
+        criteria.setDescendantsCount(descendantsCount);
+
+
+        List<CategoryDto> categories = categoryService.getAllCategories(page, size, criteria);
         return ResponseEntity.ok(categories);
     }
 }

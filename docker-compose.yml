@@ -25,6 +25,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
 
   backend:
     build:
@@ -34,18 +36,17 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-#      - keycloak
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      # Connection details for PostgreSQL
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/categorydb
       SPRING_DATASOURCE_USERNAME: giluser
       SPRING_DATASOURCE_PASSWORD: gilpass
-      # Keycloak base URL (if integrating security)
-#      KEYCLOAK_URL: http://keycloak:8080
-      # Additional environment variables if needed
+
     ports:
       - "8080:8080"
+
+volumes:
+  postgres-data:
 
 #  frontend:
 #    build:

@@ -26,6 +26,9 @@ public class Category {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Category> children = new HashSet<>();
 
+    @Column(name = "descendants_count", nullable = false)
+    private int descendantsCount = 0;
+
     public String getName() {
         return name;
     }
@@ -52,6 +55,9 @@ public class Category {
     public void setChildren(Set<Category> children) {
         this.children = children;
     }
+
+    public int getDescendantsCount() { return this.descendantsCount; }
+    public void setDescendantsCount(int exactDescendants) { this.descendantsCount = exactDescendants; }
 
 
     public void addChild(Category child) {

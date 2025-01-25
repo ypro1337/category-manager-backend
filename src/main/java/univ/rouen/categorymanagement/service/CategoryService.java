@@ -1,5 +1,7 @@
 package univ.rouen.categorymanagement.service;
 import univ.rouen.categorymanagement.dto.CategoryDto;
+import univ.rouen.categorymanagement.repository.criteria.CategoryCriteria;
+
 import java.util.List;
 
     public interface CategoryService {
@@ -7,6 +9,6 @@ import java.util.List;
         CategoryDto updateCategory(Long id, CategoryDto dto);
         void deleteCategory(Long id);
         CategoryDto getCategory(Long id);
-        List<CategoryDto> getAllCategories(int page, int size, String sort, String filter);
+        List<CategoryDto> getAllCategories(int page, int size, CategoryCriteria criteria);
     }
 
